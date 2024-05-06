@@ -35,7 +35,8 @@ After that we are going to import our dataset:
 ## Clean and Exploratory
 
 ```{r}
-SD <- read.csv("C:/Users/cjlan/OneDrive/Documents/Salary_Data.csv")
+url <- "https://raw.githubusercontent.com/ConnorLandreth/Spring24_Data_Viz/ConnorLandreth/Salary_Data.csv"
+SD <- read.csv(url)
 avgsal <- SD %>%
   group_by(Age) %>%
   summarize(avg_salary = mean(Salary)) %>%
@@ -48,97 +49,6 @@ avgyr <- SD %>%
 
 ```
 
-
-## Deliverable 1 - One Categorical & One Numerical
-
-### One Numerical - YOE
-
-
-
-```{r}
-
-SD$Years.of.Experience <- as.numeric(SD$Years.of.Experience)
-
-# Creating a gradient-colored histogram for Years.of.Experience with labels
-ggplot(SD, aes(x = Years.of.Experience, fill = ..x..)) +
-  geom_histogram(binwidth = 1, color = "black", alpha = 0.7) + # Using geom_histogram for a histogram
-  scale_fill_gradient(low = "blue", high = "lightblue") +
-  geom_text(
-    aes(label = ..count..),
-    stat = "count",
-    vjust = -0.5,
-    size = 2
-  ) +
-  labs(title = "Years of Experience Distribution", subtitle = "United States, 2022", x = "Years of Experience", y = "Count") +
-  theme_economist() +
-  theme(
-    text = element_text(size = 12),
-    plot.title = element_text(face = "bold", size = 16),
-    plot.title.position = "panel",  # Adjust title position
-    plot.caption = element_text(face = "bold", size = 10, hjust = 0, margin = margin(t = 20)),  # Adjust margin for subtitle
-    axis.title.x = element_text(size = 14),
-    axis.title.y = element_text(size = 14),
-    axis.text = element_text(size = 12),
-    panel.grid.major = element_blank(),
-    axis.text.y = element_blank(),
-    legend.position = "none"
-  ) +
-  annotate(
-    "text",
-    x = 26.5,
-    y = 220,
-    label = "68.4% Of the population has 10 years or less of experience",
-    color = "blue",
-    size = 2.75
-  )
-
-
-
-```
-
-
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-
-## Objectives
-
-- One Categorical Variable & One Numerical Variable (Salary & Job Title)
-- Two Numerical Variables (Age & Years of Experience)
-- Two Categorical Variables (Job Title & Education Level)
-
-
-### Tools being used
-
-For this project we are going to use Salary Prediction dataset available on Kaggle
-
-In this research I'm going to filter out the data by male gender and removing the age groups that do not have values which I will specify underneath each section. The objective is to first create three visualizations with varying variable types, then do some loose exploratory visualization and modeling.
-
-
-```{r}
-library(tidyverse)
-library(ggthemes)
-```
-
-After that we are going to import our dataset:
-
-## Clean and Exploratory
-
-```{r}
-SD <- read.csv("C:/Users/cjlan/OneDrive/Documents/Salary_Data.csv")
-avgsal <- SD %>%
-  group_by(Age) %>%
-  summarize(avg_salary = mean(Salary)) %>%
-  filter(!(Age %in% c(26, 31, 36)))
-
-avgyr <- SD %>%
-  group_by(Years.of.Experience) %>%
-  summarize(avg_salary = mean(Salary)) %>%
-  filter(!(Years.of.Experience %in% c(6, 8)))
-
-```
 
 
 ## Homework 1 - One Categorical & One Numerical
@@ -149,6 +59,8 @@ avgyr <- SD %>%
 
 ```{r}
 
+write_rds()
+
 SD$Years.of.Experience <- as.numeric(SD$Years.of.Experience)
 
 # Creating a gradient-colored histogram for Years.of.Experience with labels
@@ -188,11 +100,49 @@ ggplot(SD, aes(x = Years.of.Experience, fill = ..x..)) +
 
 ```
 
+```{r}
+# One Numerical - Years of Experience
+ggplot(SD, aes(x = Years.of.Experience, fill = ..x..)) +
+  geom_histogram(binwidth = 1, color = "black", alpha = 0.7) + 
+  scale_fill_gradient(low = "blue", high = "lightblue") +
+  geom_text(
+    aes(label = ..count..),
+    stat = "count",
+    vjust = -0.5,
+    size = 2
+  ) +
+  labs(title = "Years of Experience Distribution", subtitle = "United States, 2022", x = "Years of Experience", y = "Count") +
+  theme_economist() +
+  theme(
+    text = element_text(size = 12),
+    plot.title = element_text(face = "bold", size = 16),
+    plot.title.position = "panel",
+    plot.caption = element_text(face = "bold", size = 10, hjust = 0, margin = margin(t = 20)),
+    axis.title.x = element_text(size = 14),
+    axis.title.y = element_text(size = 14),
+    axis.text = element_text(size = 12),
+    panel.grid.major = element_blank(),
+    axis.text.y = element_blank(),
+    legend.position = "none"
+  ) +
+  annotate(
+    "text",
+    x = 26.5,
+    y = 220,
+    label = "68.4% Of the population has 10 years or less of experience",
+    color = "blue",
+    size = 2.75
+  )
 
+# One Categorical - Education Level
+ggplot(SD %>% filter(!is.na(Education.Level)), aes(x = Education.Level)) +
+  geom_bar(fill = "skyblue", color = "steelblue") +
+  geom_text(stat = 'count', aes(label = ..count..), vjust = -0.5, size = 3, color = "black") +  # Add count labels above the bars
+  labs(title = "Distribution of Education Levels", subtitle = "United States, 2022", x = "Education Level", y = "") +  # Remove y-axis label
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better readability
 
-### One Categorical - Edu Lvl
-
-
+```
 
 
 
@@ -474,117 +424,6 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 
 ```
-### Dark Version
-```{r}
-# Define UI
-ui <- fluidPage(
-  tags$head(
-    tags$style(HTML("
-      body { background-color: #121212; color: #FFFFFF; }
-      .shiny-text-output { color: #FFFFFF; }
-      h1, h2, h3, h4, h5, h6 { color: #FFFFFF; }
-      .well { background-color: #262626; color: #FFFFFF; }
-      .btn { border: 1px solid #4CAF50; }
-    "))
-  ),
-  titlePanel("Job Data Dashboard"),
-  fluidRow(
-    column(6, plotOutput("salaryPlot")),
-    column(6, plotOutput("ageExperiencePlot"))
-  ),
-  fluidRow(
-    column(12, plotOutput("educationLevelPlot"))
-  )
-)
-
-# Define server logic
-server <- function(input, output) {
-
-  # Visualization for 'One Categorical & One Numerical'
-  output$salaryPlot <- renderPlot({
-    top_job_titles <- SD %>%
-      group_by(Job.Title) %>%
-      summarize(count = n()) %>%
-      arrange(desc(count)) %>%
-      slice_head(n = 6) %>%
-      pull(Job.Title)
-
-    filtered_data <- SD %>%
-      filter(Job.Title %in% top_job_titles)
-
-    ggplot(filtered_data, aes(x = Job.Title, y = Salary)) +
-      geom_boxplot(fill = "skyblue", color = "steelblue") +
-      labs(title = "Salaries for Top 6 Job Titles", x = "Job Title", y = "Salary") +
-      theme_minimal() +
-      theme(plot.background = element_rect(fill = "#121212", color = "#121212"),
-            panel.background = element_rect(fill = "#121212"),
-            text = element_text(color = "white"),
-            axis.text.x = element_text(angle = 45, hjust = 1),
-            axis.text = element_text(color = "white"),
-            axis.title = element_text(color = "white"),
-            legend.title = element_text(color = "white"),
-            legend.text = element_text(color = "white"))
-  })
-
-  # Visualization for 'Two Numerical'
-  output$ageExperiencePlot <- renderPlot({
-    ggplot(SD, aes(x = Age, y = Years.of.Experience)) +
-      geom_point(aes(color = Salary), size = 3) +
-      labs(title = "Age vs. Years of Experience", x = "Age", y = "Years of Experience", color = "Salary") +
-      scale_color_gradient(low = "blue", high = "red") +
-      theme_minimal() +
-      theme(plot.background = element_rect(fill = "#121212", color = "#121212"),
-            panel.background = element_rect(fill = "#121212"),
-            text = element_text(color = "white"),
-            axis.text = element_text(color = "white"),
-            axis.title = element_text(color = "white"),
-            legend.title = element_text(color = "white"),
-            legend.text = element_text(color = "white"))
-  })
-
-  # Visualization for 'Two Categorical'
-  output$educationLevelPlot <- renderPlot({
-    SD <- SD %>%
-      mutate(Education.Level = case_when(
-        grepl("Bachelor", Education.Level, ignore.case = TRUE) ~ "Bachelor's",
-        grepl("Master", Education.Level, ignore.case = TRUE) ~ "Master's",
-        TRUE ~ as.character(Education.Level)
-      ))
-
-    SD$Education.Level <- factor(SD$Education.Level, levels = c("PhD", "Master's", "Bachelor's", "High School"))
-
-    top_job_titles <- SD %>%
-      group_by(Job.Title) %>%
-      summarize(count = n()) %>%
-      arrange(desc(count)) %>%
-      slice_head(n = 6) %>%
-      pull(Job.Title)
-
-    filtered_data <- SD %>%
-      filter(Job.Title %in% top_job_titles)
-
-    ggplot(filtered_data, aes(x = Education.Level, fill = Job.Title)) +
-      geom_bar(position = "dodge") +
-      labs(title = "Top 6 Job Titles by Education Level", x = "Education Level", y = "Count", fill = "Job Title") +
-      theme_minimal() +
-      theme(plot.background = element_rect(fill = "#121212", color = "#121212"),
-            panel.background = element_rect(fill = "#121212"),
-            text = element_text(color = "white"),
-            axis.text = element_text(color = "white"),
-            axis.title = element_text(color = "white"),
-            legend.position = "top",
-            legend.title = element_text(color = "white"),
-            legend.text = element_text(color = "white"))
-  })
-}
-
-# Run the app
-shinyApp(ui = ui, server = server)
-
-
-
-
-```
 
 
 
@@ -744,8 +583,8 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 
 
-
-
-
 ```
+
+
+
 
